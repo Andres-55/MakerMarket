@@ -29,6 +29,14 @@ app.get('/', (req, res) => {
     res.send('Maker Market Backend running');
 });
 
+app.get('/equipment', async(req, res) => {
+    try {
+        const equipment = await db.collection('equipment').find({}).toArray();
+        res.json(equipment);
+    } catch(err) {
+        res.status(500).send('Error fetching equipment.');
+    }
+});
 
 connectToDB().then(() => {
     app.listen(port, () => {
