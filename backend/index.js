@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 const { MongoClient, ObjectId } = require('mongodb');
 
 const app = express();
@@ -26,6 +27,7 @@ async function connectToDB() {
 }
 
 app.use(cors());
+app.use(express.json());
 
 app.get('/', (req, res) => {
     res.send('Maker Market Backend running');
@@ -56,6 +58,47 @@ app.get('/equipment/:id', async(req, res) => {
     } catch(err) {
         res.status(500).send("Error fetching equipment details.");
     }
+});
+
+
+app.post('/register', async (req, res) => {
+    const {username, firstName, lastName, email, phoneNumber, bio, password} = req.body;
+
+    if(!username || !firstName || !email || !password) {
+        return res.status(400).send("Please fill out all required fields.");
+    }
+
+    const userExists = await db.collection('users').findOne({
+        username: username
+    });
+    const emailExists = await db.collection('users').findOne({
+        email: email
+    });
+
+    if(emailExists) {
+        return res.status(400).send("Email already exists");
+    }
+    if(userExists) {
+        return res.status(400).send("Username already exists.");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = {
+        username,
+        firstName,
+        lastName: lastName || "",
+        email, 
+        phoneNumber: phoneNumber || "",
+        bio: bio || "",
+        passwordHash: hashedPassword,
+        googleId: null,
+        createdAt: new Date()
+    };
+
+    await db.collection('users').insertOne(newUser);
+    console.log(req.body);
+    res.send("Registered account.");
 });
 
 connectToDB().then(() => {
