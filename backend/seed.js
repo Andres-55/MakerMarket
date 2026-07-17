@@ -1,8 +1,10 @@
+require('dotenv').config();
+
 const {MongoClient} = require('mongodb');
 
-const url = 'mongodb+srv://andressolorio48_db_user:kpyNK8oqlwBojCM8@makermarketdb.1igjx7c.mongodb.net/?appName=makerMarketDB';
+const url = process.env.MONGODB_URI;
 const client = new MongoClient(url);
-const dbName = 'makerMarketDB';
+const dbName = process.env.DB_NAME;
 
 const eqipmentToSeed = [
     { name: 'Prusa MK4S', Category: '3D Printer', description: 'Reliable 3D printer', price: 20, available: true },

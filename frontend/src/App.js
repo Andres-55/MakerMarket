@@ -1,4 +1,6 @@
 import React, {useState, useEffect} from "react";
+import {BrowserRouter, Routes, Route, Link} from "react-router-dom";
+import EquipmentDetails from "./pages/equipmentDetails";
 import "./App.css";
 
 function App() {
@@ -15,25 +17,34 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Maker Market</h1>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={
+          <div className="App">
+            <header className="App-header">
+              <h1>Maker Market</h1>
 
-        <div className="equipment-list">
-          {equipment.map(item => (
-            <div className="equipment-card" key={item._id}>
-              <h2>{item.name}</h2>
-              <p>Category: {item.category}</p>
-              <p>{item.description}</p>
-              <p>${item.price}/day</p>
-              <p>
-                {item.available ? "Available" : "Currently Rented"}
-              </p>
-            </div>
-          ))}
-        </div>
-      </header>
-    </div>
+              <div className="equipment-list">
+                {equipment.map(item => (
+                  <Link to={`/equipment/${item._id}`} key={item._id}>
+                    <div className="equipment-card" >
+                      <h2>{item.name}</h2>
+                      <p>Category: {item.category}</p>
+                      <p>{item.description}</p>
+                      <p>${item.price}/day</p>
+                      <p>
+                        {item.available ? "Available" : "Currently Rented"}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </header>
+          </div>
+        } />
+        <Route path="/equipment/:id" element={<EquipmentDetails />} />
+      </Routes>
+    </BrowserRouter>
   ); 
 }
 

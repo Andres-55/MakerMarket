@@ -1,14 +1,16 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT;
 
-const url = 'mongodb+srv://andressolorio48_db_user:kpyNK8oqlwBojCM8@makermarketdb.1igjx7c.mongodb.net/?appName=makerMarketDB';
+const url = process.env.MONGODB_URI;
 const client = new MongoClient(url);
 
-const dbName = 'makerMarketDB';
+const dbName = process.env.DB_NAME;
 
 let db;
 
@@ -29,12 +31,30 @@ app.get('/', (req, res) => {
     res.send('Maker Market Backend running');
 });
 
+//gets all the equipment from the data base
 app.get('/equipment', async(req, res) => {
     try {
         const equipment = await db.collection('equipment').find({}).toArray();
         res.json(equipment);
     } catch(err) {
         res.status(500).send('Error fetching equipment.');
+    }
+});
+
+//gets the details from a specific equipment from the database
+app.get('/equipment/:id', async(req, res) => {
+    const id = req.params.id;
+
+    try {
+        const equipment = await db.collection('equipment').findOne({_id: new ObjectId(id)});
+
+        if(!equipment) {
+            return res.status(404).send("Equipment not found");
+        }
+
+        res.json(equipment);
+    } catch(err) {
+        res.status(500).send("Error fetching equipment details.");
     }
 });
 
