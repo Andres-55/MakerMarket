@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import {Link, useNavigate} from "react-router-dom";
 
 function Register() {
 
@@ -10,6 +11,7 @@ function Register() {
     const [bio, setBio] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const navigate = useNavigate();
 
     const registerUser = async (event) => {
         event.preventDefault();
@@ -37,7 +39,12 @@ function Register() {
             });
 
             const message = await response.text();
-            alert(message);
+            
+            if(response.ok) {
+                alert("Account registered. Please log in.");
+                navigate("/");
+            }
+            else alert(message);
 
         } catch (err) {
             console.error(err);
@@ -142,6 +149,10 @@ function Register() {
                 </button>
 
             </form>
+
+            <br />
+
+            <p>Already have an account?{" "} <Link to="/">Login here</Link></p>
         </div>
     );
 }
