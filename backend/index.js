@@ -135,11 +135,24 @@ app.post('/login', async (req, res) => {
 
 });
 
-app.get('/profile', authenticateToken, (req, res) => {
-    res.json({
-        message: "Succefully authenticated",
-        user: req.user
-    });
+app.get('/profile', authenticateToken,  async (req, res) => {
+    try{
+        const user = await db.collection('users').findOne({_id: new ObjectId(req.userID)});
+
+        if(!user) return res.status(404).send("User not found.");
+
+        res.json({
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            bio: user.bio,
+            createdAt: user.createdAt
+        });
+    } catch(err) {
+        res.status(500).send("Error getting profile.");
+    }
 });
 
 connectToDB().then(() => {
