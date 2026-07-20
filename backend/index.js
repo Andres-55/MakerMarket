@@ -108,6 +108,7 @@ app.post('/register', async (req, res) => {
     res.send("Registered account.");
 });
 
+//checks if the username and password is correct and logs the user in with a token
 app.post('/login', async (req, res) => {
     const {username, password} = req.body;
     const user = await db.collection('users').findOne({username: username});
@@ -135,9 +136,10 @@ app.post('/login', async (req, res) => {
 
 });
 
+//gets info about the users profile
 app.get('/profile', authenticateToken,  async (req, res) => {
     try{
-        const user = await db.collection('users').findOne({_id: new ObjectId(req.userID)});
+        const user = await db.collection('users').findOne({_id: new ObjectId(req.user.userID)});
 
         if(!user) return res.status(404).send("User not found.");
 
@@ -153,6 +155,27 @@ app.get('/profile', authenticateToken,  async (req, res) => {
     } catch(err) {
         res.status(500).send("Error getting profile.");
     }
+});
+
+//updates the users profile
+app.put('/profile', authenticateToken, async(req, res) =>{
+    const {firstName, lastName, phoneNumber, bio} = req.body;
+
+    await db.collection('users').updateOne(
+        {
+            _id: new ObjectId(req.user.userID)
+        },
+        {
+            $set: {
+                firstName,
+                lastName,
+                phoneNumber,
+                bio
+            }
+        }
+    );
+
+    res.send("profile updated.");
 });
 
 connectToDB().then(() => {
