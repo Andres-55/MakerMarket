@@ -2,6 +2,8 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const { MongoClient, ObjectId } = require('mongodb');
 
 const app = express();
@@ -26,6 +28,21 @@ async function connectToDB() {
 }
 
 app.use(cors());
+app.use(express.json());
+
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if(!token) return res.sendStatus(401);
+
+    jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+        if(err) return res.sendStatus(403);
+
+        req.user = user;
+        next();
+    });
+}
 
 app.get('/', (req, res) => {
     res.send('Maker Market Backend running');
@@ -48,14 +65,117 @@ app.get('/equipment/:id', async(req, res) => {
     try {
         const equipment = await db.collection('equipment').findOne({_id: new ObjectId(id)});
 
-        if(!equipment) {
-            return res.status(404).send("Equipment not found");
-        }
+        if(!equipment) return res.status(404).send("Equipment not found");
 
         res.json(equipment);
     } catch(err) {
         res.status(500).send("Error fetching equipment details.");
     }
+});
+
+//registers a new user to the database
+app.post('/register', async (req, res) => {
+    const {username, firstName, lastName, email, phoneNumber, bio, password} = req.body;
+
+    if(!username || !firstName || !email || !password) return res.status(400).send("Please fill out all required fields.");
+
+    const userExists = await db.collection('users').findOne({
+        username: username
+    });
+    const emailExists = await db.collection('users').findOne({
+        email: email
+    });
+
+    if(emailExists) return res.status(400).send("Email already exists");
+    if(userExists) return res.status(400).send("Username already exists.");
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = {
+        username,
+        firstName,
+        lastName: lastName || "",
+        email, 
+        phoneNumber: phoneNumber || "",
+        bio: bio || "",
+        passwordHash: hashedPassword,
+        googleId: null,
+        createdAt: new Date()
+    };
+
+    await db.collection('users').insertOne(newUser);
+    console.log(req.body);
+    res.send("Registered account.");
+});
+
+//checks if the username and password is correct and logs the user in with a token
+app.post('/login', async (req, res) => {
+    const {username, password} = req.body;
+    const user = await db.collection('users').findOne({username: username});
+
+    if(!user) return res.status(400).send("Wrong username or password.");
+
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+
+    if(!isPasswordValid) return res.status(400).send("Wrong username or password");
+
+    const token = jwt.sign(
+        {
+            userID: user._id,
+            username: user.username
+        },
+        process.env.JWT_SECRET_KEY,
+        {expiresIn: "1h"}
+    );
+
+
+    res.json({
+        message: "Login successful",
+        token: token
+    });
+
+});
+
+//gets info about the users profile
+app.get('/profile', authenticateToken,  async (req, res) => {
+    try{
+        const user = await db.collection('users').findOne({_id: new ObjectId(req.user.userID)});
+
+        if(!user) return res.status(404).send("User not found.");
+
+        res.json({
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            bio: user.bio,
+            createdAt: user.createdAt
+        });
+    } catch(err) {
+        res.status(500).send("Error getting profile.");
+    }
+});
+
+//updates the users profile
+app.put('/profile', authenticateToken, async(req, res) =>{
+    const {firstName, lastName, phoneNumber, bio} = req.body;
+
+    await db.collection('users').updateOne(
+        {
+            _id: new ObjectId(req.user.userID)
+        },
+        {
+            $set: {
+                firstName,
+                lastName,
+                phoneNumber,
+                bio
+            }
+        }
+    );
+
+    res.send("profile updated.");
 });
 
 connectToDB().then(() => {
