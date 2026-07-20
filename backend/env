@@ -1,0 +1,3 @@
+MONGODB_URI=mongodb+srv://andressolorio48_db_user:kogtVrXM8K3UmZPK@makermarketdb.1igjx7c.mongodb.net/?appName=makerMarketDB
+PORT=3001
+DB_NAME=makerMarketDB

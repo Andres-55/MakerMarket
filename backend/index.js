@@ -58,6 +58,67 @@ app.get('/equipment/:id', async(req, res) => {
     }
 });
 
+// gets all reviews for a piece of equipment
+app.get('/equipment/:id/reviews', async(req, res) => {
+    try {
+        const reviews = await db.collection('reviews')
+            .find({ equipmentId: req.params.id })
+            .sort({ createdAt: -1 })
+            .toArray();
+        res.json(reviews);
+    } catch(err) {
+        res.status(500).send('Error fetching reviews.');
+    }
+});
+
+app.post('/equipment/:id/reviews', express.json(), async(req, res) => {
+    try {
+        const authorId = req.body.authorId;
+        const rating = req.body.rating;
+        const comment = req.body.comment;
+
+        const result = await db.collection('reviews').insertOne({
+
+        });
+
+        res.status(201).json({ _id: result.insertedId });
+    } catch(err) {
+        res.status(500).send('Error posting review.');
+    }
+});
+
+// gets a user's profile
+app.get('/users/:id', async(req, res) => {
+    try {
+        const user = await db.collection('users').findOne(
+
+        );
+
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        res.json(user);
+    } catch(err) {
+        res.status(500).send('Error fetching user.');
+    }
+});
+
+// updates a user's profile
+app.put('/users/:id', express.json(), async(req, res) => {
+    try {
+        const { name, email, phone, bio, avatarUrl } = req.body;
+
+        await db.collection('users').updateOne(
+
+        );
+
+        res.sendStatus(200);
+    } catch(err) {
+        res.status(500).send('Error updating profile.');
+    }
+});
+
 connectToDB().then(() => {
     app.listen(port, () => {
         console.log(`Server is running at http://localhost:${port}`);
