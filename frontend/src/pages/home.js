@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from "react";
-import {Link} from "react-router-dom";
-import EquipmentDetails from "./equipmentDetails";
+import {Link, useNavigate} from "react-router-dom";
 import "../App.css";
 
 function App() {
   const [equipment, setEquipment] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("http://localhost:3001/equipment").then(response => response.json()).then(data => {
@@ -19,6 +19,17 @@ function App() {
   return (
     <div className="App">
     <header className="App-header">
+        <div>
+            <button onClick={() => {
+                localStorage.removeItem("token");
+                navigate("/");
+                }}>
+                Logout
+            </button>
+            
+            <button onClick={() => navigate("/profile")}>Profile</button>
+        </div>
+        
         <h1>Maker Market</h1>
 
         <div className="equipment-list">

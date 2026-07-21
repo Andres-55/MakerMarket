@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 
 function EquipmentDetails() {
 
     const {id} = useParams();
     const [equipment, setEquipment] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetch(`http://localhost:3001/equipment/${id}`).then(response => response.json()).then(data => {
@@ -21,6 +22,9 @@ function EquipmentDetails() {
 
     return (
         <div>
+            <div>
+                <button onClick={() => navigate("/home")}>{"<"}- Back</button>
+            </div>
             <h1>{equipment.name}</h1>
             <p>Category: {equipment.category}</p>
             <p>{equipment.description}</p>

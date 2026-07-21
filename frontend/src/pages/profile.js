@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from "react";
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
     const [user, setUser] = useState(null);
     const [edit, setEdit] = useState(false);
+    const navigate = useNavigate();
 
     //updates the profile if the chooser clicks Save Changes
     const updateProfile = async () => {
@@ -53,6 +55,17 @@ function Profile() {
 
     return (
         <div>
+            <div>
+                <button onClick={() => {
+                    localStorage.removeItem("token");
+                    navigate("/");
+                }}>
+                    Logout
+                </button>
+                <button onClick={() => navigate("/home")}>
+                    Home
+                </button>
+            </div>
             <h1>Profile</h1>
 
             <p>Username: {user.username}</p>
