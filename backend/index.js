@@ -58,6 +58,35 @@ app.get('/equipment', async(req, res) => {
     }
 });
 
+//gets the equipment related to what the user searched for
+app.get('/equipment/search', async(req, res) => {
+    const searchQuery = req.query.query;
+
+    if(!searchQuery) return res.status(400).send("A search query is required.");
+
+    try {
+        const results = await db.collection("equipment").find({
+            $or: [
+                {
+                    name: {
+                        $regex: searchQuery,
+                        $options: "i"
+                    }
+                },
+                {
+                    category: {
+                        $regex: searchQuery,
+                        $options: "i"
+                    }
+                }
+            ]
+        }).toArray();
+        res.json(results);
+    } catch(err) {
+        res.status(500).send("Error searching equipment.");
+    }
+});
+
 //gets the details from a specific equipment from the database
 app.get('/equipment/:id', async(req, res) => {
     const id = req.params.id;
