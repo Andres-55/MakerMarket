@@ -73,12 +73,17 @@ app.get('/equipment/:id/reviews', async(req, res) => {
 
 app.post('/equipment/:id/reviews', express.json(), async(req, res) => {
     try {
-        const authorId = req.body.authorId;
+        const equipmentID = req.params.id;
+        const userID = req.body.userID;
         const rating = req.body.rating;
         const comment = req.body.comment;
 
         const result = await db.collection('reviews').insertOne({
-
+            equipmentId: equipmentID,
+            userId: userID,
+            rating: rating,
+            comment: comment,
+            createdAt: new Date()
         });
 
         res.status(201).json({ _id: result.insertedId });
