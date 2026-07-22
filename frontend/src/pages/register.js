@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {Link, useNavigate} from "react-router-dom";
+import "./register.css";
 
 function Register() {
 
@@ -53,7 +54,7 @@ function Register() {
     };
 
     return (
-        <div>
+        <div className="page">
             <h1>Create Account</h1>
 
             <form onSubmit={registerUser}>
@@ -144,15 +145,17 @@ function Register() {
 
                 <br /><br />
 
-                <button type="submit">
-                    Create Account
-                </button>
+                <div className="button">
+                    <button type="submit">
+                        Create Account
+                    </button>
+                </div>
 
             </form>
 
-            <br />
-
-            <p>Already have an account?{" "} <Link to="/">Login here</Link></p>
+            <div className="loginButton">
+                <p>Already have an account?{" "} <Link to="/">Login here</Link></p>
+            </div>
         </div>
     );
 }
