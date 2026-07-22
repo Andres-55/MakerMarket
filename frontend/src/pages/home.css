@@ -1,0 +1,91 @@
+* {
+    padding: 0% 0%;
+    margin: 0% 0%;
+    box-sizing: border-box;
+}
+
+.homePage {
+    padding: 2% 2%;
+    margin-bottom: 8%;
+}
+
+.homeContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2%;
+    width: 100%;
+}
+
+.homeTitle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1%;
+}
+
+.searchContainer {
+    margin-left: auto;  
+    display: flex;  
+    width: 30%;
+    gap: 5%;
+    padding-left: 1%;
+    margin-right: 8%;
+    margin-bottom: 0%;
+}
+
+.searchInput {
+    padding: 2% 2%;
+    margin: 5% 5%;
+    margin-right: 0%;
+}
+
+.searchButton {
+    padding: 1% 5%;
+    margin: 5% 5%;
+    margin-left: 0%;
+    font-size: 0.9rem;
+}
+
+.line {
+    border-bottom: 2px solid rgba(0,0,0,1);
+    margin-bottom: 3%;
+}
+
+.equipmentList {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    row-gap: 10%;
+    column-gap: 2%;
+    padding: 0% 3%;
+}
+
+.equipmentCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 8% 1%;
+    border: 2px solid rgba(0,0,0,1);
+    border-radius: 15px;
+}
+
+.equipmentLink {
+    text-decoration: none;
+}
+
+.equipmentCard h2, .equipmentCard p {
+    margin-bottom: 3%;
+    color: rgba(0,0,0,1);
+}
+
+.equipmentCard h2 {
+    font-size: 2.2rem;
+    font-weight: 600;
+    text-decoration: underline
+}
+
+.equipmentCard p {
+    font-size: 1.2rem;
+}
