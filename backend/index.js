@@ -5,12 +5,14 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { MongoClient, ObjectId } = require('mongodb');
+const {OAuth2Client} = require("google-auth-library");
 
 const app = express();
 const port = process.env.PORT;
 
 const url = process.env.MONGODB_URI;
 const client = new MongoClient(url);
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const dbName = process.env.DB_NAME;
 
@@ -103,7 +105,7 @@ app.get('/equipment/:id', async(req, res) => {
 });
 
 //registers a new user to the database
-app.post('/register', async (req, res) => {
+app.post('/register', async(req, res) => {
     const {username, firstName, lastName, email, phoneNumber, bio, password} = req.body;
 
     if(!username || !firstName || !email || !password) return res.status(400).send("Please fill out all required fields.");
@@ -138,7 +140,7 @@ app.post('/register', async (req, res) => {
 });
 
 //checks if the username and password is correct and logs the user in with a token
-app.post('/login', async (req, res) => {
+app.post('/login', async(req, res) => {
     const {username, password} = req.body;
     const user = await db.collection('users').findOne({username: username});
 
@@ -157,12 +159,93 @@ app.post('/login', async (req, res) => {
         {expiresIn: "1h"}
     );
 
-
     res.json({
         message: "Login successful",
         token: token
     });
 
+});
+
+//logs in the user using google sign in
+app.post('/google-login', async(req, res) => {
+        const {credential} = req.body;
+
+        try { //checks the google token
+            const ticket = await googleClient.verifyIdToken({
+                idToken: credential,
+                audience: process.env.GOOGLE_CLIENT_ID
+            });
+
+            const payload = ticket.getPayload();
+            const googleId = payload.sub;
+            const email = payload.email;
+            const firstName = payload.given_name;
+            const username = email.split("@")[0];
+
+            //checks if google account exists exists
+            let user = await db.collection('users').findOne({
+                googleId: googleId
+            });
+            
+            if(!user) {
+                user = await db.collection('users').findOne({
+                    email: email
+                });
+
+                if(user) {
+                    await db.collection('users').updateOne(
+                        {
+                            _id: user._id
+                        },
+                        {
+                            $set:{
+                                googleId: googleId
+                            }
+                        }
+                    )
+                }
+
+                else {
+                    const newUser = {
+                        username: username,
+                        firstName: firstName,
+                        lastName: "",
+                        email: email,
+                        phoneNumber: "",
+                        bio: "",
+                        passwordHash: null,
+                        googleId: googleId,
+                        createdAt: new Date()
+                    };
+
+                    const result = await db.collection('users').insertOne(newUser);
+
+                    user = {
+                        _id: result.insertId,
+                        ...newUser
+                    };
+                }
+            } 
+
+            const token = jwt.sign(
+                {
+                    userID: user._id,
+                    username: user.userName
+                },
+                process.env.JWT_SECRET_KEY,
+                {
+                    expiresIn: "1h"
+                }
+            );
+
+            res.json({
+                message: "Google logged in successfully",
+                token: token
+            });
+        } catch(err) {
+            console.err("Google sign in error", err);
+            res.status(500).send("Google authentication failed.");
+        }
 });
 
 //gets info about the users profile
