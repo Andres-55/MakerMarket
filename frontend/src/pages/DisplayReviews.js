@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
+import {Star} from "lucide-react";
 
-
-const USERID = "";
+const USERID = "0";
 
 function DisplayReviews() {
+
+    const {equipmentId} = useParams();
     const [reviews, setReviews] = useState([]);
     const [exists, setStatus] = useState(true);
     const [error, setError] = useState(null);
@@ -23,6 +25,10 @@ function DisplayReviews() {
         setReviews(data);
     } catch (err) {
         console.error('Error fetching reviews:', err);
+        setError("Unable to load reviews.");
+
+    } finally {
+        setStatus(false);
     }
     }
     
@@ -30,7 +36,7 @@ function DisplayReviews() {
     <div>
         <h2>Reviews</h2>
  
-        <loadReview equipmentId={equipmentId} onSubmitted={loadEquipmentReviews} />
+        <WriteReview equipmentId={equipmentId} onSubmitted={loadEquipmentReviews} />
  
         <div>
             {exists && <p>Loading reviews…</p>}
@@ -39,14 +45,14 @@ function DisplayReviews() {
             <p>No reviews yet. Be the first to leave one.</p>
             )}
             {reviews.map((r) => (
-            <ReviewItem key={r._id} review={r} />
+            <LoadReview key={r._id} review={r} />
             ))}
         </div>
     </div>
     );
 }
 
-function loadReview(review) {
+function LoadReview({review}) {
     return (
     <div>
         <div>
@@ -62,7 +68,7 @@ function loadReview(review) {
   );
 }
 
-function writeReview(equipmentId, onSubmitted) {
+function WriteReview({equipmentId, onSubmitted}) {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [comment, setComment] = useState("");
@@ -78,7 +84,7 @@ function writeReview(equipmentId, onSubmitted) {
         setSubmit(true);
         try {
             const res = await fetch(`http://localhost:3001/equipment/${equipmentId}/reviews`, {
-                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userID: CURRENT_USER_ID, rating, comment }),
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userID: USERID, rating, comment }),
             });
         
             if (!res.ok){
@@ -94,13 +100,51 @@ function writeReview(equipmentId, onSubmitted) {
             setError("Error submitting review.");
         }
         finally {
-            setSubmitting(false);
+            setSubmit(false);
         }
     }
 
     return (
-        <div></div>
+        <form onSubmit={submitReview}>
+    <p>Leave a review</p>
+
+    <div>
+        {Array.from({ length: 5 }).map((_, i) => {
+        const value = i + 1;
+        return (
+            <button
+                key={i}
+                type="button"
+                onClick={() => setRating(value)}
+                onMouseEnter={() => setHoverRating(value)}
+                onMouseLeave={() => setHoverRating(0)}
+                className="text-amber-500"
+                >
+                <Star size={22} fill={value <= (hoverRating || rating) ? "currentColor" : "none"} />
+                </button>
+            );
+            })}
+        </div>
+
+        <textarea
+            rows={2}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="How was your rental?"
+            className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm"
+        />
+
+        {error && <p className="text-xs text-red-600 mt-2">{error}</p>}
+
+        <button
+            type="submit"
+            disabled={submit}
+        >
+            {submit ? "Submitting…" : "Submit review"}
+        </button>
+        </form>
     );
+
 }
 
-export default Profile;
+export default DisplayReviews;

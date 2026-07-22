@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from "react";
 import {BrowserRouter, Routes, Route, Link} from "react-router-dom";
 import EquipmentDetails from "./pages/equipmentDetails";
+import DisplayReviews from "./pages/DisplayReviews";
 import "./App.css";
 
 function App() {
   const [equipment, setEquipment] = useState([]);
-
+  
   useEffect(() => {
     fetch("http://localhost:3001/equipment").then(response => response.json()).then(data => {
       console.log("Equipment fetched from API:" , data);
@@ -43,6 +44,7 @@ function App() {
           </div>
         } />
         <Route path="/equipment/:id" element={<EquipmentDetails />} />
+        <Route path="/equipment/:equipmentId/reviews" element={<DisplayReviews />} />
       </Routes>
     </BrowserRouter>
   ); 

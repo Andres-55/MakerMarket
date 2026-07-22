@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
+
 
 function EquipmentDetails() {
 
@@ -28,6 +29,7 @@ function EquipmentDetails() {
             <p>
                 {equipment.available ? "Available" : "Currently Rented"}
             </p>
+            <Link to={`/equipment/${equipment._id}/reviews`}>See reviews</Link>
         </div>
     );
 }
