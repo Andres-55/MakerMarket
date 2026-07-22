@@ -39,13 +39,13 @@ function Login() {
     };
 
     return (
-        <div class="page">
-            <div class="title">
+        <div className="page">
+            <div className="title">
                 <h1>Maker Market</h1>
             </div>
 
             <form onSubmit={loginUser}>
-                <div class="input">
+                <div className="input">
                     <label>Username</label>
                     <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required/>
 
@@ -53,8 +53,8 @@ function Login() {
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required/>
                 </div>
 
-                <div class="submitButton">
-                    <button type="submit">Login</button>
+                <div className="submitContainer">
+                    <button className="submitButton" type="submit">Login</button>
                 </div>
 
                 <div className="googleButton">
@@ -84,7 +84,7 @@ function Login() {
 
             </form>
 
-            <div class="accountLink">
+            <div className="accountLink">
                 <p>New to MakerMarket? {" "} <Link to="/register">Create an account.</Link></p>
             </div>
         </div>

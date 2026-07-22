@@ -36,7 +36,7 @@ input {
     padding: 1.5% 1%;
 }
 
-.button {
+.registerButtonContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -44,6 +44,10 @@ input {
     margin-bottom: 10%;
 }
 
-.loginButton {
+.registerButton {
+    padding: 2% 5%;
+}
+
+.loginLink {
     font-size: 0.9rem;
 }

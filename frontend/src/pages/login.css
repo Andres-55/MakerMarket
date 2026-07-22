@@ -13,8 +13,11 @@
     justify-content: center;
     align-items: center;
     margin-bottom: 5%;
-    margin-top: 8%;
-    font-size: 2rem;
+    margin-top: 6%;
+}
+
+.title h1 {
+    font-size: 5rem;
 }
 
 .input {
@@ -25,25 +28,27 @@
 }
 
 label {
-    margin-bottom: 0.5%;
-    font-size: 1.25rem;
+    margin-bottom: 3%;
+    font-size: 1.5rem;
 }
 
 input {
-    margin-bottom: 1.5%;
+    margin-bottom: 10%;
     padding-top: 0.1%;
+    width: 80%;
 }
 
-.submitButton {
+.submitContainer {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 3%;
+    margin-bottom: 25%;
 }
 
-button {
+.submitButton {
     font-size: 1rem;
-    padding: 0.25% 1%;
+    padding: 0.5% 3%;
+
 }
 
 .googleButton {
@@ -58,7 +63,7 @@ button {
     justify-content: center;
     align-items: center;
     width: 100%;
-    margin-top: 10%;
+    margin-top: 8%;
 }
 
 .accountLink p {

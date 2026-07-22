@@ -16,7 +16,7 @@
 }
 
 .logoutButton, .homeButton, .profileButton {
-    padding: 4% 15%;
+    padding: 6% 25%;
 }
 
 .profileTitle {
@@ -41,6 +41,7 @@
 
 .saveEditButton {
     margin-top: 4%;
+    padding: 0.2% 1.5%;
 }
 
 .bottomButton {
