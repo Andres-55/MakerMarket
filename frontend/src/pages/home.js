@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import {Link, useNavigate} from "react-router-dom";
-import "../App.css";
+import "./home.css";
 
 function App() {
   const [equipment, setEquipment] = useState([]);
@@ -35,40 +35,48 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className="homePage">
     <header className="App-header">
-        <div>
-            <button onClick={() => {
-                localStorage.removeItem("token");
-                navigate("/");
-                }}>
-                Logout
-            </button>
-            
-            <button onClick={() => navigate("/profile")}>Profile</button>
-        </div>
-        
-        <h1>Maker Market</h1>
-
-        <div>
-            <input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)}/>
-            <button onClick={searchEquipment}>Search</button>
-        </div>
-
-        <div className="equipment-list">
-        {equipment.map(item => (
-            <Link to={`/equipment/${item._id}`} key={item._id}>
-            <div className="equipment-card" >
-                <h2>{item.name}</h2>
-                <p>Category: {item.category}</p>
-                <p>{item.description}</p>
-                <p>${item.price}/day</p>
-                <p>
-                {item.available ? "Available" : "Currently Rented"}
-                </p>
+        <div className="homeContainer">
+            <div>
+                <button className="logoutButton" onClick={() => {
+                    localStorage.removeItem("token");
+                    navigate("/");
+                    }}>
+                    Logout
+                </button>
             </div>
-            </Link>
-        ))}
+
+            <div>
+                <button className="profileButton" onClick={() => navigate("/profile")}>Profile</button>
+            </div>
+        </div>
+
+        <div className="homeTitle">
+            <h1>Maker Market</h1>
+        </div>
+
+        <div className="searchContainer">
+            <input className="searchInput" type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)}/>
+            <button className="searchButton" onClick={searchEquipment}>Search</button>
+        </div>
+
+        <div className="line"></div>
+
+        <div className="equipmentList">
+            {equipment.map(item => (
+                <Link to={`/equipment/${item._id}`} key={item._id} className="equipmentLink">
+                <div className="equipmentCard" >
+                    <h2>{item.name}</h2>
+                    <p>Category: {item.category}</p>
+                    <p>{item.description}</p>
+                    <p>${item.price}/day</p>
+                    <p>
+                    {item.available ? "Available" : "Currently Rented"}
+                    </p>
+                </div>
+                </Link>
+            ))}
         </div>
     </header>
     </div>        

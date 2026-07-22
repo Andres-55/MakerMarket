@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
+import ('./profile.css');
 
 function Profile() {
     const [user, setUser] = useState(null);
@@ -25,9 +26,6 @@ function Profile() {
                 })
             });
 
-            const message = await response.text();
-
-            alert(message);
             setEdit(false);
         } catch(err) {
             console.error("Error updating profile:", err);
@@ -54,73 +52,97 @@ function Profile() {
     }
 
     return (
-        <div>
-            <div>
-                <button onClick={() => {
-                    localStorage.removeItem("token");
-                    navigate("/");
-                }}>
-                    Logout
-                </button>
-                <button onClick={() => navigate("/home")}>
-                    Home
-                </button>
+        <div className="profilePage">
+            <div className="container">
+                <div>
+                    <button className="logoutButton" onClick={() => {
+                        localStorage.removeItem("token");
+                        navigate("/");
+                    }}>
+                        Logout
+                    </button>
+                </div>
+
+                <div>
+                    <button className="homeButton" onClick={() => navigate("/home")}>
+                        Home
+                    </button>
+                </div>
             </div>
-            <h1>Profile</h1>
 
-            <p>Username: {user.username}</p>
+            <div className="profileTitle">
+                <h1>Profile</h1>
+            </div>
 
-            <p>Email: {user.email}</p>
+            <div className="info">
+                <p className="infoTitle">Username: </p> 
+                <p>{user.username}</p>
+            </div>
 
-            <p>First Name:</p>
-            { edit ? (                                                          //checks if the user chose to edit their profile, if yes then add an input box, if not just show the info
-                <input type="text" value={user.firstName} onChange={(e) => 
-                    setUser({
-                        ...user,
-                        firstName: e.target.value
-                    })
-                } 
-                />) : (<p>{user.firstName}</p>)
-            }
+            <div className="info">
+                <p className="infoTitle">Email: </p> 
+                <p>{user.email}</p>
+            </div>
 
-            <p>Last Name:</p>
-            { edit ? (
-                <input type="text" value={user.lastName} onChange={(e) => 
-                    setUser({
-                        ...user,
-                        lastName: e.target.value
-                    })
-                } 
-                />) : (<p>{user.lastName}</p>)
-            }
-
-            <p>Phone Number:</p>
-            { edit ? (
-                <input type="tel" value={user.phoneNumber} onChange={(e) => 
-                    setUser({
-                        ...user,
-                        phoneNumber: e.target.value
-                    })
-                } 
-                />) : (<p>{user.phoneNumber}</p>)
-            }
-
-            <p>Bio: {user.bio}</p>
-            { edit ? (
-                <textarea value={user.bio} onChange={(e) =>
-                    setUser({
-                        ...user,
-                        bio: e.target.value
-                    })
+            <div className="info">
+                <p className="infoTitle"> First Name:</p>
+                { edit ? (      //checks if the user chose to edit their profile, if yes then add an input box, if not just show the info
+                    <input type="text" value={user.firstName} onChange={(e) => 
+                        setUser({
+                            ...user,
+                            firstName: e.target.value
+                        })
+                    } 
+                    />) : (<p>{user.firstName}</p>)
                 }
-                />) : (<p>{user.bio}</p>)
-            }
+            </div>
 
-            { edit ? (
-                <button onClick={updateProfile}>Save Chnages</button>
-            ): (
-                <button onClick={() => setEdit(true)}>Edit Profile</button>
-            )}
+            <div className="info">
+                <p className="infoTitle">Last Name:</p>
+                { edit ? (
+                    <input type="text" value={user.lastName} onChange={(e) => 
+                        setUser({
+                            ...user,
+                            lastName: e.target.value
+                        })
+                    } 
+                    />) : (<p>{user.lastName}</p>)
+                }
+            </div>
+
+            <div className="info">
+                <p className="infoTitle">Phone Number:</p>
+                { edit ? (
+                    <input type="tel" value={user.phoneNumber} onChange={(e) => 
+                        setUser({
+                            ...user,
+                            phoneNumber: e.target.value
+                        })
+                    } 
+                    />) : (<p>{user.phoneNumber}</p>)
+                }
+            </div>
+
+            <div className="info">
+                <p className="infoTitle">Bio: </p>
+                { edit ? (
+                    <textarea value={user.bio} onChange={(e) =>
+                        setUser({
+                            ...user,
+                            bio: e.target.value
+                        })
+                    }
+                    />) : (<p>{user.bio}</p>)
+                }
+            </div>
+
+            <div className="bottomButton">
+                { edit ? (
+                    <button class="saveEditButton" onClick={updateProfile}>Save Changes</button>
+                ): (
+                    <button class="saveEditButton" onClick={() => setEdit(true)}>Edit Profile</button>
+                )}
+            </div>
 
         </div>
     );
