@@ -70,15 +70,14 @@ function App() {
         <div className="equipmentList">
             {equipment.map(item => (
                 <Link to={`/equipment/${item._id}`} key={item._id} className="equipmentLink">
-                <div className="equipmentCard" >
-                    <h2>{item.name}</h2>
-                    <p>Category: {item.category}</p>
-                    <p>{item.description}</p>
-                    <p>${item.price}/day</p>
-                    <p>
-                    {item.available ? "Available" : "Currently Rented"}
-                    </p>
-                </div>
+                    <div className="equipmentCard" >
+                        <h2>{item.name}</h2>
+                        <p>Category: {item.category}</p>
+                        <p>${item.price}/day</p>
+                        <p>
+                        {item.available ? "Available" : "Currently Rented"}
+                        </p>
+                    </div>
                 </Link>
             ))}
         </div>
