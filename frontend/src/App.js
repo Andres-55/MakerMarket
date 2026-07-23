@@ -5,7 +5,7 @@ import Login from "./pages/login";
 import Profile from "./pages/profile";
 import EquipmentDetails from "./pages/equipmentDetails";
 import Home from "./pages/home";
-import DisplayReviews from "./pages/DsiplayReviews";
+import DisplayReviews from "./pages/DisplayReviews";
 
 function App() {
   return (
