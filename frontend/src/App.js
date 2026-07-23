@@ -5,6 +5,7 @@ import Login from "./pages/login";
 import Profile from "./pages/profile";
 import EquipmentDetails from "./pages/equipmentDetails";
 import Home from "./pages/home";
+import DisplayReviews from "./pages/DsiplayReviews";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/equipment/:id" element={<EquipmentDetails />} />
+        <Route path="/equipment/:equipmentId/reviews" element={<DisplayReviews />} />
       </Routes>
     </BrowserRouter>
   );

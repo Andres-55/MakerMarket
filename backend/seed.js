@@ -1,3 +1,6 @@
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 require('dotenv').config();
 
 const {MongoClient} = require('mongodb');
@@ -7,10 +10,10 @@ const client = new MongoClient(url);
 const dbName = process.env.DB_NAME;
 
 const eqipmentToSeed = [
-    { name: 'Prusa MK4S', category: '3D Printer', description: 'Reliable 3D printer', price: 20, available: true },
-    { name: 'Canon EOS R50', category: 'Camera', description: 'jdfkhgkjhkjg', price: 30, available: true },
-    { name: 'Soldering Kit', category: 'Soldering', description: 'gnfdkhkjdh', price: 10, available: true },
-    { name: 'Jetson Nano', category: 'Computer', description: 'Computer that focuses on AI.', price: 30, available: true }
+    { name: 'Prusa MK4S', category: '3D Printer', description: 'Reliable 3D printer', price: 20, available: true, ownerId: 0 },
+    { name: 'Canon EOS R50', category: 'Camera', description: 'jdfkhgkjhkjg', price: 30, available: true, ownerId: 0 },
+    { name: 'Soldering Kit', category: 'Soldering', description: 'gnfdkhkjdh', price: 10, available: true, ownerId: 0 },
+    { name: 'Jetson Nano', category: 'Computer', description: 'Computer that focuses on AI.', price: 30, available: true, ownerId: 0 }
 ];
 
 async function runSeed() {

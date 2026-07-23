@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
-import {useParams, useNavigate} from "react-router-dom";
+import {Link, useParams, useNavigate} from "react-router-dom";
+import Rent from "../buttons/Rent";
 
 function EquipmentDetails() {
 
@@ -32,6 +33,12 @@ function EquipmentDetails() {
             <p>
                 {equipment.available ? "Available" : "Currently Rented"}
             </p>
+            <Link to={`/equipment/${equipment._id}/reviews`}>See reviews</Link>
+            <Rent
+            equipmentId={equipment._id}
+            available={equipment.available}
+            onRented={() => window.location.reload()}
+            />
         </div>
     );
 }
