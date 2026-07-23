@@ -112,29 +112,38 @@ function UserEquipment() {
 
         <h2>Equipment Owned:</h2>
 
-        <div>
+        <div className="equipmentSection">
             {owned.map((item) => (
                 <div key={item._id}>
                     <p>{item.name}</p>
-                    <p>{item.description}</p>
+                    <p>Category: {item.category}</p>
+                    <p>Description: {item.description}</p>
+                    <p>Price: {item.price}/day</p>
+                    <p>
+                        {item.available ? "Available" : "Currently Rented"}
+                    </p>
                     <button onClick={() => navigate(`/equipment-form/${item._id}`)}>Edit</button>
                     <button onClick={() => deleteEquipment(item._id)}>Delete</button>
                 </div>
             ))}
-            <button onClick={() => navigate("/equipment-form")}>
-                Add New Equipment
-            </button>
         </div>
+
+        <button onClick={() => navigate("/equipment-form")}>
+            Add New Equipment
+        </button>
 
         
 
         <h2>Currently Renting:</h2>
 
-        <div>
-            {rented.length === 0 && <p>You aren't renting anything right now.</p>}
+        <div className="equipmentSection">
             {rented.map((rental) => (
                 <div key={rental._id}>
                     <p>{rental.equipment?.name ?? "Unavailable"}</p>
+                    <p>Category: {rental.equipment?.category ?? "Unavailable"}</p>
+                    <p>Description: {rental.equipment?.description ?? "Unavailable"}</p>
+                    <p>Price: ${rental.equipment?.price ?? "Unavailable"}/day</p>
+                    <p>Rented: {new Date(rental.startDate).toLocaleDateString()} until {new Date(rental.endDate).toLocaleDateString()}</p>
                     <button onClick={() => returnEquipment(rental._id)}>Return</button>
                 </div>
                 ))}

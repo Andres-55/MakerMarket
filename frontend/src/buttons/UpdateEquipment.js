@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
+import "./UpdateEquipment.css";
 
 function UpdateEquipment() {
     const {id} = useParams(); // present when editing, undefined when adding new
@@ -39,7 +40,9 @@ function UpdateEquipment() {
                 },
                 body
             });
-            if (!res.ok) throw new Error(await res.text());
+            if (!res.ok) {
+                throw new Error(await res.text());
+            }
             navigate("/my-equipment");
         } catch(err) {
             console.error("Error saving equipment:", err);
@@ -48,7 +51,7 @@ function UpdateEquipment() {
 
     return (
         <div className="UpdateEquipment">
-            <button className="UpdateEquipment-back" onClick={() => navigate("/my-equipment")}>Back</button>
+            <button onClick={() => navigate("/my-equipment")}>Back</button>
 
             <form onSubmit={SubmitEquipment}>
                 <label>

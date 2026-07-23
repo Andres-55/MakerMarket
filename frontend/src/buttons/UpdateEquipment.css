@@ -1,0 +1,10 @@
+.UpdateEquipment label {
+    display: block;
+    margin-bottom: 12px;
+}
+
+.UpdateEquipment input {
+    display: block;
+    margin-top: 6px;
+}
+

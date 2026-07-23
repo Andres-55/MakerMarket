@@ -196,7 +196,7 @@ app.get('/equipment/:id/recommendations', async(req, res) => {
 
     // updates equipment, only if the logged in user owns it
     app.put('/equipment/:id', authenticateToken, async(req, res) => {
-        const {name, description, notes} = req.body;
+        const {name, category, description, price} = req.body;
 
         try {
             const equipment = await db.collection('equipment').findOne({_id: new ObjectId(req.params.id)});
@@ -326,6 +326,7 @@ app.delete('/users/:userId/bookmarks/:equipmentId', async(req, res) => {
 app.post('/rentals', express.json(), async(req, res) => {
     try {
         const {equipmentId, renterId, startDate, endDate} = req.body;
+        const todayStr = new Date().toISOString().split("T")[0];
 
         const equipment = await db.collection('equipment').findOne({_id: new ObjectId(equipmentId)});
         if (!equipment) {
@@ -333,6 +334,13 @@ app.post('/rentals', express.json(), async(req, res) => {
         }
         if (!equipment.available) {
             return res.status(400).send("Equipment is not available");
+        }
+
+        if (startDate < todayStr) {
+            return res.status(400).send("Invalid start date.");
+        }
+        if (endDate < startDate) {
+            return res.status(400).send("Invalid end date.");
         }
 
         const result = await db.collection('rentals').insertOne({

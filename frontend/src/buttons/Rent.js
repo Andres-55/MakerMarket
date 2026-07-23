@@ -53,15 +53,17 @@
         return <p>Currently unavailable for rent.</p>;
     }
 
+    const today = new Date().toISOString().split("T")[0];
+
     return (
         <div className="RentalCard">
         <label className="RentalCard-field">
             Start date:
-            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+            <input min={today} type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         </label>
         <label className="RentalCard-field">
             End date:
-            <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+            <input min={startDate || today} type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         </label>
 
         {error && <p>{error}</p>}
