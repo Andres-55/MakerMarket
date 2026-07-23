@@ -1,0 +1,72 @@
+* {
+    padding: 0% 0%;
+    margin: 0% 0%;
+    box-sizing: border-box;
+}
+
+.page {
+    padding: 2% 2%;
+}
+
+.title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 5%;
+    margin-top: 6%;
+}
+
+.title h1 {
+    font-size: 5rem;
+}
+
+.input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1%;
+}
+
+label {
+    margin-bottom: 3%;
+    font-size: 1.5rem;
+}
+
+input {
+    margin-bottom: 10%;
+    padding-top: 0.1%;
+    width: 80%;
+}
+
+.submitContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25%;
+}
+
+.submitButton {
+    font-size: 1rem;
+    padding: 0.5% 3%;
+
+}
+
+.googleButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.accountLink {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 8%;
+}
+
+.accountLink p {
+    font-size: 0.9rem;
+}
+
