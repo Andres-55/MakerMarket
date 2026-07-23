@@ -1,0 +1,25 @@
+.ReviewCard {
+    border: 1px solid #e2e2e2;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+}
+
+.ReviewCard-stars {
+    display: flex;
+    gap: 2px;
+    color: #f5a623;
+    margin-bottom: 6px;
+}
+
+.ReviewCard-comment {
+    font-size: 0.95rem;
+    color: #333;
+    margin: 4px 0;
+}
+
+.ReviewCard-date {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+}

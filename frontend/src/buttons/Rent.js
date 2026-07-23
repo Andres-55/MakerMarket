@@ -1,7 +1,7 @@
     import { useState } from "react";
+    import "./Rent.css";
 
     const USERID = "0";
-    const API_BASE = "http://localhost:3001";
 
     // Drop into the equipment detail page:
     // <RentButton equipmentId={item._id} available={item.available} onRented={() => window.location.reload()} />
@@ -18,7 +18,7 @@
         }
         setSubmit(true);
         try {
-        const res = await fetch(`${API_BASE}/rentals`, {
+        const res = await fetch(`http://localhost:3001/rentals`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ equipmentId, renterId: USERID, startDate, endDate }),
@@ -38,12 +38,12 @@
     }
 
     return (
-        <div>
-        <label>
+        <div className="RentalCard">
+        <label className="RentalCard-field">
             Start date:
             <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         </label>
-        <label>
+        <label className="RentalCard-field">
             End date:
             <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         </label>

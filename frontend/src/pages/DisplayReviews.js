@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import {Link, useParams, useNavigate} from "react-router-dom";
 import {Star} from "lucide-react";
+import "./DisplayReviews.css";
 
 const USERID = "0";
 
@@ -10,10 +11,24 @@ function DisplayReviews() {
     const [reviews, setReviews] = useState([]);
     const [exists, setStatus] = useState(true);
     const [error, setError] = useState(null);
+    const [equipment, setEquipment] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         loadEquipmentReviews();
+        loadEquipmentDetails();
     }, [equipmentId]);
+
+    async function loadEquipmentDetails() {
+        try {
+            const res = await fetch(`http://localhost:3001/equipment/${equipmentId}`);
+            if (!res.ok) throw new Error("Failed to load equipment");
+            const data = await res.json();
+            setEquipment(data);
+        } catch (err) {
+            console.error('Error fetching equipment:', err);
+        }
+    }
 
     async function loadEquipmentReviews() {
     try {
@@ -34,7 +49,10 @@ function DisplayReviews() {
     
     return (
     <div>
-        <h2>Reviews</h2>
+        <div equipmentId={equipmentId}>
+            <button onClick={() => navigate(`/equipment/${equipmentId}`)}>{"<"}- Back</button>
+        </div>
+        <h2>{equipment ? `Reviews for ${equipment.name}` : "Reviews"}</h2>
  
         <WriteReview equipmentId={equipmentId} onSubmitted={loadEquipmentReviews} />
  
@@ -54,14 +72,14 @@ function DisplayReviews() {
 
 function LoadReview({review}) {
     return (
-    <div>
-        <div>
+    <div className="ReviewCard">
+        <div className="ReviewCard-stars" aria-label={`${review.rating} out of 5 stars`}>
             {Array.from({ length: 5 }).map((_, i) => (
                 <Star key={i} size={14} fill={i < review.rating ? "currentColor" : "none"} />
             ))}
         </div>
-        <p>{review.comment}</p>
-        <p>
+        <p className="ReviewCard-comment">{review.comment}</p>
+        <p className="ReviewCard-date" dateTime={review.createdAt}>
             {new Date(review.createdAt).toLocaleDateString()}
         </p>
     </div>
@@ -131,10 +149,9 @@ function WriteReview({equipmentId, onSubmitted}) {
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="How was your rental?"
-            className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm"
         />
 
-        {error && <p className="text-xs text-red-600 mt-2">{error}</p>}
+        {error && <p>{error}</p>}
 
         <button
             type="submit"

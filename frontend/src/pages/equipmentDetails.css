@@ -1,0 +1,9 @@
+.equipmentCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 8% 1%;
+    border: 2px solid rgba(0,0,0,1);
+    border-radius: 15px;
+}

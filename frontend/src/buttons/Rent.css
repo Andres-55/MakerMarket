@@ -1,0 +1,36 @@
+.RentalCard {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 320px;
+    padding: 16px;
+    border: 1px solid #e2e2e2;
+    border-radius: 8px;
+}
+
+.RentalCard-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.RentalCard-field input {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.RentalCard-field input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.RentalCard-error {
+    color: #d32f2f;
+    font-size: 0.85rem;
+    margin: 0;
+}

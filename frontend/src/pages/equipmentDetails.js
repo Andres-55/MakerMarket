@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Link, useParams, useNavigate} from "react-router-dom";
 import Rent from "../buttons/Rent";
+import "./equipmentDetails.css";
 
 function EquipmentDetails() {
 
@@ -23,9 +24,8 @@ function EquipmentDetails() {
 
     return (
         <div>
-            <div>
-                <button onClick={() => navigate("/home")}>{"<"}- Back</button>
-            </div>
+            <button onClick={() => navigate("/home")}>{"<"}- Back</button>
+        <div className="equipmentCard">
             <h1>{equipment.name}</h1>
             <p>Category: {equipment.category}</p>
             <p>{equipment.description}</p>
@@ -39,6 +39,7 @@ function EquipmentDetails() {
             available={equipment.available}
             onRented={() => window.location.reload()}
             />
+        </div>
         </div>
     );
 }
