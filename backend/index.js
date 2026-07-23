@@ -1,4 +1,6 @@
-    require('dotenv').config();
+   const dns = require('dns');
+   dns.setServers(['8.8.8.8', '8.8.4.4']);
+   require('dotenv').config();
 
     const express = require('express');
     const cors = require('cors');
@@ -149,7 +151,9 @@
             const {userId, equipmentId} = req.body;
 
             const existing = await db.collection('bookmarks').findOne({userId, equipmentId});
-            if (existing) return res.status(200).json(existing);
+            if (existing) {
+                return res.status(200).json(existing);
+            }
 
             const result = await db.collection('bookmarks').insertOne({
                 userId, equipmentId, createdAt: new Date()
@@ -171,6 +175,91 @@
     } catch(err) {
             res.status(500).send('Error removing bookmark.');
     }
+    });
+
+
+    // rents a piece of equipment
+    app.post('/rentals', express.json(), async(req, res) => {
+        try {
+            const {equipmentId, renterId, startDate, endDate} = req.body;
+
+            const equipment = await db.collection('equipment').findOne({_id: new ObjectId(equipmentId)});
+            if (!equipment) {
+                return res.status(404).send("Equipment not found");
+            }
+            if (!equipment.available) {
+                return res.status(400).send("Equipment is not available");
+            }
+
+            const result = await db.collection('rentals').insertOne({
+                equipmentId,
+                renterId,
+                ownerId: equipment.ownerId,
+                status: "active",
+                startDate,
+                endDate,
+                createdAt: new Date()
+            });
+
+            await db.collection('equipment').updateOne(
+                {_id: new ObjectId(equipmentId)},
+                {$set: {available: false}}
+            );
+
+            res.status(201).json({_id: result.insertedId});
+        } catch(err) {
+            res.status(500).send('Error creating rental.');
+        }
+    });
+
+    // marks a rental as completed (equipment returned)
+    app.put('/rentals/:id/complete', async(req, res) => {
+        try {
+            const rental = await db.collection('rentals').findOne({_id: new ObjectId(req.params.id)});
+            if (!rental) {
+                return res.status(404).send("Rental not found");
+            }
+
+            await db.collection('rentals').updateOne(
+                {_id: new ObjectId(req.params.id)},
+                {$set: {status: "completed"}}
+            );
+
+            await db.collection('equipment').updateOne(
+                {_id: new ObjectId(rental.equipmentId)},
+                {$set: {available: true}}
+            );
+
+            res.sendStatus(200);
+        } catch(err) {
+            res.status(500).send('Error completing rental.');
+        }
+    });
+
+    // gets equipment a user is currently renting (as the renter)
+    app.get('/users/:id/rentals', async(req, res) => {
+        try {
+            const rentals = await db.collection('rentals')
+                .find({renterId: req.params.id})
+                .sort({createdAt: -1})
+                .toArray();
+            res.json(rentals);
+        } catch(err) {
+            res.status(500).send('Error fetching rentals.');
+        }
+    });
+
+    // gets rentals for equipment a user owns (as the owner)
+    app.get('/users/:id/rentals-owned', async(req, res) => {
+        try {
+            const rentals = await db.collection('rentals')
+                .find({ownerId: req.params.id})
+                .sort({createdAt: -1})
+                .toArray();
+            res.json(rentals);
+        } catch(err) {
+            res.status(500).send('Error fetching owned rentals.');
+        }
     });
 
     connectToDB().then(() => {
