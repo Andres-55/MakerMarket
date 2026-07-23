@@ -48,6 +48,10 @@ function App() {
             </div>
 
             <div>
+                <button className="myEquipmentButton" onClick={() => navigate("/my-equipment")}>My Equipment</button>
+            </div>
+
+            <div>
                 <button className="profileButton" onClick={() => navigate("/profile")}>Profile</button>
             </div>
         </div>

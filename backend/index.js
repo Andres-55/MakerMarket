@@ -1,20 +1,20 @@
-   const dns = require('dns');
-   dns.setServers(['8.8.8.8', '8.8.4.4']);
-   require('dotenv').config();
+    const dns = require('dns');
+    dns.setServers(['8.8.8.8', '8.8.4.4']);
+    require('dotenv').config();
 
-const express = require('express');
-const cors = require('cors');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { MongoClient, ObjectId } = require('mongodb');
-const {OAuth2Client} = require("google-auth-library");
+    const express = require('express');
+    const cors = require('cors');
+    const bcrypt = require('bcrypt');
+    const jwt = require('jsonwebtoken');
+    const { MongoClient, ObjectId } = require('mongodb');
+    const {OAuth2Client} = require("google-auth-library");
 
-    const app = express();
-    const port = process.env.PORT;
+        const app = express();
+        const port = process.env.PORT;
 
-const url = process.env.MONGODB_URI;
-const client = new MongoClient(url);
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const url = process.env.MONGODB_URI;
+    const client = new MongoClient(url);
+    const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
     const dbName = process.env.DB_NAME;
 
@@ -31,22 +31,22 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
     }
     }
 
-app.use(cors());
-app.use(express.json());
+    app.use(cors());
+    app.use(express.json());
 
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    function authenticateToken(req, res, next) {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
 
-    if(!token) return res.sendStatus(401);
+        if(!token) return res.sendStatus(401);
 
-    jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
-        if(err) return res.sendStatus(403);
+        jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+            if(err) return res.sendStatus(403);
 
-        req.user = user;
-        next();
-    });
-}
+            req.user = user;
+            next();
+        });
+    }
 
     app.get('/', (req, res) => {
         res.send('Maker Market Backend running');
@@ -62,37 +62,49 @@ function authenticateToken(req, res, next) {
     }
     });
 
-//gets the equipment related to what the user searched for
-app.get('/equipment/search', async(req, res) => {
-    const searchQuery = req.query.query;
+    //gets the equipment related to what the user searched for
+    app.get('/equipment/search', async(req, res) => {
+        const searchQuery = req.query.query;
 
-    if(!searchQuery) return res.status(400).send("A search query is required.");
+        if(!searchQuery) return res.status(400).send("A search query is required.");
 
-    try {
-        const results = await db.collection("equipment").find({
-            $or: [
-                {
-                    name: {
-                        $regex: searchQuery,
-                        $options: "i"
+        try {
+            const results = await db.collection("equipment").find({
+                $or: [
+                    {
+                        name: {
+                            $regex: searchQuery,
+                            $options: "i"
+                        }
+                    },
+                    {
+                        category: {
+                            $regex: searchQuery,
+                            $options: "i"
+                        }
                     }
-                },
-                {
-                    category: {
-                        $regex: searchQuery,
-                        $options: "i"
-                    }
-                }
-            ]
-        }).toArray();
-        res.json(results);
-    } catch(err) {
-        res.status(500).send("Error searching equipment.");
-    }
-});
+                ]
+            }).toArray();
+            res.json(results);
+        } catch(err) {
+            res.status(500).send("Error searching equipment.");
+        }
+    });
 
-//gets the details from a specific equipment from the database
-app.get('/equipment/:id', async(req, res) => {
+    // gets equipment owned by the logged in user
+    app.get('/equipment/owned', authenticateToken, async(req, res) => {
+        try {
+            const equipment = await db.collection('equipment')
+                .find({ownerId: req.user.userID})
+                .toArray();
+            res.json(equipment);
+        } catch(err) {
+            res.status(500).send('Error fetching your equipment.');
+        }
+    });
+
+    //gets the details from a specific equipment from the database
+    app.get('/equipment/:id', async(req, res) => {
     const id = req.params.id;
 
         try {
@@ -138,6 +150,73 @@ app.get('/equipment/:id', async(req, res) => {
     } catch(err) {
             res.status(500).send('Error posting review.');
     }
+    });
+
+
+    // adds new equipment owned by the logged in user
+    app.post('/equipment', authenticateToken, async(req, res) => {
+        const {name, category, description, price} = req.body;
+        if(!name) return res.status(400).send("Equipment name is required.");
+
+        try {
+            const newEquipment = {
+                name: name || "",
+                category: category || "",
+                description: description || "",
+                price: price,
+                ownerId: req.user.userID,
+                available: true,
+                createdAt: new Date()
+            };
+            const result = await db.collection('equipment').insertOne(newEquipment);
+            res.status(201).json({_id: result.insertedId});
+        } catch(err) {
+            res.status(500).send('Error adding equipment.');
+        }
+    });
+
+    // updates equipment, only if the logged in user owns it
+    app.put('/equipment/:id', authenticateToken, async(req, res) => {
+        const {name, description, notes} = req.body;
+
+        try {
+            const equipment = await db.collection('equipment').findOne({_id: new ObjectId(req.params.id)});
+            if (!equipment) {
+                return res.status(404).send("Equipment not found.");
+            }
+            if (equipment.ownerId !== req.user.userID) {
+                return res.status(403).send("You don't own this equipment.");
+            }
+
+            await db.collection('equipment').updateOne(
+                {_id: new ObjectId(req.params.id)},
+                {$set: {name, category, description, price}}
+            );
+            res.send("Equipment updated.");
+        } catch(err) {
+            res.status(500).send('Error updating equipment.');
+        }
+    });
+
+    // deletes equipment, only if the logged in user owns it
+    app.delete('/equipment/:id', authenticateToken, async(req, res) => {
+        try {
+            const equipment = await db.collection('equipment').findOne({_id: new ObjectId(req.params.id)});
+            if (!equipment) {
+                return res.status(404).send("Equipment not found.");
+            }
+            if (equipment.ownerId !== req.user.userID) {
+                return res.status(403).send("You don't own this equipment.");
+            }
+            if (!equipment.available) {
+                return res.status(400).send("Can't delete equipment that's currently rented out.");
+            }
+
+            await db.collection('equipment').deleteOne({_id: new ObjectId(req.params.id)});
+            res.sendStatus(200);
+        } catch(err) {
+            res.status(500).send('Error deleting equipment.');
+        }
     });
 
     // gets a user's profile
@@ -308,70 +387,70 @@ app.get('/equipment/:id', async(req, res) => {
         }
     });
 
-//registers a new user to the database
-app.post('/register', async(req, res) => {
-    const {username, firstName, lastName, email, phoneNumber, bio, password} = req.body;
+    //registers a new user to the database
+    app.post('/register', async(req, res) => {
+        const {username, firstName, lastName, email, phoneNumber, bio, password} = req.body;
 
-    if(!username || !firstName || !email || !password) return res.status(400).send("Please fill out all required fields.");
+        if(!username || !firstName || !email || !password) return res.status(400).send("Please fill out all required fields.");
 
-    const userExists = await db.collection('users').findOne({
-        username: username
-    });
-    const emailExists = await db.collection('users').findOne({
-        email: email
-    });
+        const userExists = await db.collection('users').findOne({
+            username: username
+        });
+        const emailExists = await db.collection('users').findOne({
+            email: email
+        });
 
-    if(emailExists) return res.status(400).send("Email already exists");
-    if(userExists) return res.status(400).send("Username already exists.");
+        if(emailExists) return res.status(400).send("Email already exists");
+        if(userExists) return res.status(400).send("Username already exists.");
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = {
-        username,
-        firstName,
-        lastName: lastName || "",
-        email, 
-        phoneNumber: phoneNumber || "",
-        bio: bio || "",
-        passwordHash: hashedPassword,
-        googleId: null,
-        createdAt: new Date()
-    };
+        const newUser = {
+            username,
+            firstName,
+            lastName: lastName || "",
+            email, 
+            phoneNumber: phoneNumber || "",
+            bio: bio || "",
+            passwordHash: hashedPassword,
+            googleId: null,
+            createdAt: new Date()
+        };
 
-    await db.collection('users').insertOne(newUser);
-    console.log(req.body);
-    res.send("Registered account.");
-});
-
-//checks if the username and password is correct and logs the user in with a token
-app.post('/login', async(req, res) => {
-    const {username, password} = req.body;
-    const user = await db.collection('users').findOne({username: username});
-
-    if(!user) return res.status(400).send("Wrong username or password.");
-
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-
-    if(!isPasswordValid) return res.status(400).send("Wrong username or password");
-
-    const token = jwt.sign(
-        {
-            userID: user._id,
-            username: user.username
-        },
-        process.env.JWT_SECRET_KEY,
-        {expiresIn: "1h"}
-    );
-
-    res.json({
-        message: "Login successful",
-        token: token
+        await db.collection('users').insertOne(newUser);
+        console.log(req.body);
+        res.send("Registered account.");
     });
 
-});
+    //checks if the username and password is correct and logs the user in with a token
+    app.post('/login', async(req, res) => {
+        const {username, password} = req.body;
+        const user = await db.collection('users').findOne({username: username});
 
-//logs in the user using google sign in
-app.post('/google-login', async(req, res) => {
+        if(!user) return res.status(400).send("Wrong username or password.");
+
+        const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+
+        if(!isPasswordValid) return res.status(400).send("Wrong username or password");
+
+        const token = jwt.sign(
+            {
+                userID: user._id,
+                username: user.username
+            },
+            process.env.JWT_SECRET_KEY,
+            {expiresIn: "1h"}
+        );
+
+        res.json({
+            message: "Login successful",
+            token: token
+        });
+
+    });
+
+    //logs in the user using google sign in
+    app.post('/google-login', async(req, res) => {
         const {credential} = req.body;
 
         try { //checks the google token

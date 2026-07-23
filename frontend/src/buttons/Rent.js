@@ -1,7 +1,12 @@
     import { useState } from "react";
     import "./Rent.css";
 
-    const USERID = "0";
+    function getUserIdFromToken() {
+        const token = localStorage.getItem("token");
+        if (!token) return null;
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        return payload.userID;
+    }
 
     // Drop into the equipment detail page:
     // <RentButton equipmentId={item._id} available={item.available} onRented={() => window.location.reload()} />
@@ -16,20 +21,31 @@
             setError("Pick a start and end date first.");
             return;
         }
+
+        const renterId = getUserIdFromToken();
+        if (!renterId) {
+            setError("You need to be logged in to rent equipment.");
+            return;
+        }
+
         setSubmit(true);
         try {
         const res = await fetch(`http://localhost:3001/rentals`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ equipmentId, renterId: USERID, startDate, endDate }),
+            body: JSON.stringify({ equipmentId, renterId: renterId, startDate, endDate }),
         });
-        if (!res.ok) throw new Error("Failed to rent");
+        if (!res.ok) {
+            throw new Error("Failed to rent");
+        }
         setError(null);
-        if (onRented) onRented();
+        if (onRented) {
+            onRented();
+        }
         } catch {
-        setError("Couldn't complete the rental. Try again.");
+            setError("Couldn't complete the rental. Try again.");
         } finally {
-        setSubmit(false);
+            setSubmit(false);
         }
     }
 

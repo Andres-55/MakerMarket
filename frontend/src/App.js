@@ -6,6 +6,9 @@ import Profile from "./pages/profile";
 import EquipmentDetails from "./pages/equipmentDetails";
 import Home from "./pages/home";
 import DisplayReviews from "./pages/DisplayReviews";
+import UserEquipment from "./pages/userEquipment";
+import UpdateEquipment from "./buttons/UpdateEquipment";
+
 
 function App() {
   return (
@@ -17,6 +20,9 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/equipment/:id" element={<EquipmentDetails />} />
         <Route path="/equipment/:equipmentId/reviews" element={<DisplayReviews />} />
+        <Route path="/my-equipment" element={<UserEquipment />} />
+        <Route path="/equipment-form" element={<UpdateEquipment />} />
+        <Route path="/equipment-form/:id" element={<UpdateEquipment />} />
       </Routes>
     </BrowserRouter>
   );
