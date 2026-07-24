@@ -22,7 +22,7 @@ A full-stack web application that allows users to rent equipment from other user
 ### 1. Clone the repository
 In the terminal, run 
 ```bash
-git clone <>
+git clone <https://github.com/Andres-55/MakerMarket.git>
 ```
 
 ### 2. Install dependencies
